@@ -18,11 +18,16 @@ function generarNumeroConsecutivo(config: FacturaConfig, seq: number): string {
  * Genera Clave de 50 dígitos.
  * Formato: [país 3][ddMMyy 6][cedula 12][consecutivo 20][situacion 1][seguridad 8]
  */
+// Costa Rica es UTC-6 sin horario de verano
+function nowCostaRica(): Date {
+  return new Date(Date.now() - 6 * 60 * 60 * 1000);
+}
+
 function generarClave(config: FacturaConfig, numeroConsecutivo: string, fecha: Date): string {
   const pais = '506';
-  const dia = String(fecha.getDate()).padStart(2, '0');
-  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-  const anio = String(fecha.getFullYear()).slice(-2);
+  const dia = String(fecha.getUTCDate()).padStart(2, '0');
+  const mes = String(fecha.getUTCMonth() + 1).padStart(2, '0');
+  const anio = String(fecha.getUTCFullYear()).slice(-2);
   const cedula = config.emisor.identificacion.numero.padStart(12, '0');
   const situacion = '1'; // 1=normal, 2=contingencia, 3=sin internet
   const seguridad = randomInt(0, 100000000).toString().padStart(8, '0');
@@ -34,7 +39,7 @@ function generarClave(config: FacturaConfig, numeroConsecutivo: string, fecha: D
  */
 function formatFecha(fecha: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}T${pad(fecha.getHours())}:${pad(fecha.getMinutes())}:${pad(fecha.getSeconds())}.000`;
+  return `${fecha.getUTCFullYear()}-${pad(fecha.getUTCMonth() + 1)}-${pad(fecha.getUTCDate())}T${pad(fecha.getUTCHours())}:${pad(fecha.getUTCMinutes())}:${pad(fecha.getUTCSeconds())}.000`;
 }
 
 /**
@@ -52,7 +57,7 @@ function num2(n: number): string {
 }
 
 export function generarXML(config: FacturaConfig, args: FacturaArgs): FacturaGenerada {
-  const fecha = new Date();
+  const fecha = nowCostaRica();
   const numeroConsecutivo = generarNumeroConsecutivo(config, args.consecutivo);
   const clave = generarClave(config, numeroConsecutivo, fecha);
   const fechaEmision = formatFecha(fecha);
