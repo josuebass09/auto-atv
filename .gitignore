@@ -1,0 +1,11 @@
+node_modules/
+dist/
+output/
+.env
+certs/*.p12
+certs/*.pfx
+certs/*.pem
+certs/*.key
+*.log
+config/factura.config.json
+config/templates/*/
