@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "factura": "node --import tsx src/index.ts",
+    "cron": "node --import tsx src/cron.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
