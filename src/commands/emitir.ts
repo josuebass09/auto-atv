@@ -1,5 +1,5 @@
 import { mkdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { createInterface } from 'node:readline/promises';
 import ora from 'ora';
 import { getCreds } from '../env.js';
@@ -65,7 +65,7 @@ export async function emitir(
   // 2. Firmar XML
   const { username, password, certPassword } = getCreds(env);
   const spin2 = ora('Firmando con XAdES-EPES...').start();
-  const { xmlFirmado, xmlBase64 } = await firmarXML(xmlString, join(root, config.cert.path), certPassword);
+  const { xmlFirmado, xmlBase64 } = await firmarXML(xmlString, resolve(root, config.cert.path), certPassword);
   spin2.succeed('Firma XAdES-EPES aplicada');
 
   // 3. Guardar archivos
