@@ -9,17 +9,26 @@ const UPSERT_MUTATION = `
 `;
 
 export async function updateRailwayVar(name: string, value: string): Promise<void> {
-  const token       = process.env['RAILWAY_TOKEN'];
-  const projectId   = process.env['RAILWAY_PROJECT_ID'];
+  const token         = process.env['RAILWAY_TOKEN'];
+  const projectId     = process.env['RAILWAY_PROJECT_ID'];
   const environmentId = process.env['RAILWAY_ENVIRONMENT_ID'];
-  const serviceId   = process.env['RAILWAY_SERVICE_ID'];
+  const serviceId     = process.env['RAILWAY_SERVICE_ID'];
 
-  if (!token || !projectId || !environmentId || !serviceId) {
-    console.warn('[CRON] Railway env vars no configuradas (RAILWAY_TOKEN, PROJECT_ID, ENVIRONMENT_ID, SERVICE_ID). Saltando actualizacion.');
+  const missing = [
+    !token         && 'RAILWAY_TOKEN',
+    !projectId     && 'RAILWAY_PROJECT_ID',
+    !environmentId && 'RAILWAY_ENVIRONMENT_ID',
+    !serviceId     && 'RAILWAY_SERVICE_ID',
+  ].filter(Boolean);
+
+  if (missing.length > 0) {
+    console.warn(`[CRON] Saltando actualizacion de ${name}: faltan vars ${missing.join(', ')}`);
     return;
   }
 
-  await axios.post(
+  console.log(`[CRON] Actualizando ${name}=${value} via Railway API...`);
+
+  const response = await axios.post(
     RAILWAY_API,
     {
       query: UPSERT_MUTATION,
@@ -35,4 +44,10 @@ export async function updateRailwayVar(name: string, value: string): Promise<voi
       timeout: 10_000,
     },
   );
+
+  if (response.data?.errors?.length) {
+    throw new Error(`Railway API error: ${JSON.stringify(response.data.errors)}`);
+  }
+
+  console.log(`[CRON] ${name} actualizado a ${value}`);
 }
