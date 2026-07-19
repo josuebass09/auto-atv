@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "CLI para emitir facturas electrónicas CR v4.4 directo al API de Hacienda",
   "type": "module",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "factura": "node --import tsx src/index.ts",
     "cron": "node --import tsx src/cron.ts",
